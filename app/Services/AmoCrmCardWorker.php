@@ -7,7 +7,8 @@ use App\Enums\AmoCrmOperationTypes;
 
 class AmoCrmCardWorker
 {
-    public function makeForCreateContact($contact){
+    public function makeForCreateContact($contact)
+    {
         $dto = new CardDataDTO();
         $dto->id = $contact['id'];
         $dto->type = AmoCrmOperationTypes::CreateContact;
@@ -15,7 +16,8 @@ class AmoCrmCardWorker
 
         return $dto;
     }
-    public function makeForCreateLead($lead){
+    public function makeForCreateLead($lead)
+    {
         $dto = new CardDataDTO();
         $dto->id = $lead['id'];
         $dto->type = AmoCrmOperationTypes::CreateCard;
@@ -24,10 +26,16 @@ class AmoCrmCardWorker
         return $dto;
     }
 
-    public function makeForUpdateLead($lead){
+    public function makeForUpdateLead($lead)
+    {
         $changedFields = [];
-        foreach ($lead['updated_fields'] as $field => $value) {
-            $changedFields[] = "{$field}: {$value}";
+
+        if (isset($lead['updated_fields'])) {
+            foreach ($lead['updated_fields'] as $field => $value) {
+                $changedFields[] = "{$field}: {$value}";
+            }
+        } else {
+            $changedFields = $lead;
         }
 
         $dto = new CardDataDTO();
@@ -36,13 +44,17 @@ class AmoCrmCardWorker
         $dto->message = "Измененные поля: " . implode(', ', $changedFields) . "\nВремя изменения: " . date('Y-m-d H:i:s', $lead['updated_at']);
 
         return $dto;
-
     }
 
-    public function makeForUpdateContact($contact){
+    public function makeForUpdateContact($contact)
+    {
         $changedFields = [];
-        foreach ($contact['updated_fields'] as $field => $value) {
-            $changedFields[] = "{$field}: {$value}";
+        if (isset($contact['updated_fields'])) {
+            foreach ($contact['updated_fields'] as $field => $value) {
+                $changedFields[] = "{$field}: {$value}";
+            }
+        } else {
+            $changedFields = $contact;
         }
 
         $dto = new CardDataDTO();
@@ -51,6 +63,5 @@ class AmoCrmCardWorker
         $dto->message =  "Измененные поля: " . implode(', ', $changedFields) . "\nВремя изменения: " . date('Y-m-d H:i:s', $contact['updated_at']);
 
         return $dto;
-
     }
 }
